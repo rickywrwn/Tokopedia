@@ -123,7 +123,7 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
         
         if indexPath.row == 0{
 
-            return CGSize(width: view.frame.width, height: 170)
+            return CGSize(width: view.frame.width, height: 230)
         }
         return CGSize(width: view.frame.width, height: 110)
     }
@@ -163,9 +163,6 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
     
     @objc func switchChanged(sender: UISwitch!) {
         print("Switch value is \(sender.isOn)")
-        if sender.isOn == false{
-            print("matek")
-        }
     }
     
     @objc func handleApply(){
@@ -244,12 +241,31 @@ class PriceCell: BaseCell {
         whole.isOn = ViewController.varUrl.wholesale
         return whole
     }()
-    
-    let dividerLineView: UIView = {
+    let blankView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(white: 0.4, alpha: 0.4)
+        view.backgroundColor = UIColor(white: 0.0, alpha: 0.0)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    let LineKiri: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(white: 0.4, alpha: 0.1)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    let LineKanan: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(white: 0.4, alpha: 0.1)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    let garisImg: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.image = UIImage(named: "garis")
+        iv.layer.masksToBounds = true
+        return iv
     }()
     
     override func setupViews() {
@@ -262,15 +278,19 @@ class PriceCell: BaseCell {
         addSubview(priceSlider)
         addSubview(wholeLabel)
         addSubview(wholeSwitch)
-        addSubview(dividerLineView)
+        addSubview(LineKiri)
+        addSubview(LineKanan)
+        addSubview(garisImg)
         
         addConstraintsWithFormat("H:|-10-[v0(150)][v1(150)]-5-|", views: labelMin,labelMax)
-        addConstraintsWithFormat("H:|-10-[v0(150)]-5-[v2][v1(150)]-5-|", views: hargaMin,hargaMax,dividerLineView)
+        addConstraintsWithFormat("H:|-10-[v0(150)][v1(150)]-5-|", views: hargaMin,hargaMax)
+        addConstraintsWithFormat("H:|-10-[v0(170)][v1(170)]-5-|", views: LineKiri,LineKanan)
+        addConstraintsWithFormat("H:|-15-[v0]-15-|", views: garisImg)
         addConstraintsWithFormat("H:|-15-[v0]-15-|", views: priceSlider)
         addConstraintsWithFormat("H:|-10-[v0(150)][v1(50)]-10-|", views: wholeLabel,wholeSwitch)
         
-        addConstraintsWithFormat("V:[v0]-5-[v1]-5-[v2]-5-[v3]-10-|", views: labelMin,hargaMin,priceSlider,wholeLabel)
-        addConstraintsWithFormat("V:[v0]-5-[v1]-5-[v2]-5-[v3]-10-|", views: labelMax,hargaMax,priceSlider,wholeSwitch)
+        addConstraintsWithFormat("V:[v0]-5-[v1]-7-[v4(1)]-25-[v5(20)][v2]-5-[v3]-10-|", views: labelMin,hargaMin,priceSlider,wholeLabel,LineKiri,garisImg)
+        addConstraintsWithFormat("V:[v0]-5-[v1]-7-[v4(1)]-25-[v5(20)][v2]-5-[v3]-10-|", views: labelMax,hargaMax,priceSlider,wholeSwitch,LineKanan,garisImg)
         
     }
 }
