@@ -84,44 +84,45 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ShopTypeCellId, for: indexPath) as! ShopTypeCell
         cell.backgroundColor = UIColor.white
-        if indexPath.row == 1 {
-            cell.titleLabel.text = "Official Store"
-            if officialChecked == true {
-                cell.checkBtn.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
-            }else{
-                cell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-            }
-        }
+        cell.officialBtn.addTarget(self, action: #selector(handleOfficial), for: .touchDown)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2
+        return 1
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        return CGSize(width: view.frame.width, height: 70)
+        return CGSize(width: view.frame.width, height: 130)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell: ShopTypeCell = self.userCollectionView.cellForItem(at: indexPath) as! ShopTypeCell
-        if indexPath.row == 0 && goldChecked == false {
-            cell.checkBtn.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
-            goldChecked = true
-        }else if indexPath.row == 0 && goldChecked == true{
-            cell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-            goldChecked = false
-        }else if indexPath.row == 1 && officialChecked == false{
-            cell.checkBtn.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
-            officialChecked = true
-        }else if indexPath.row == 1 && officialChecked == true{
-            cell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-            officialChecked = false
-        }
+//        if goldChecked == false {
+//            cell.goldBtn.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
+//            goldChecked = true
+//        }else if goldChecked == true{
+//            cell.goldBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+//            goldChecked = false
+//        }
+        
     }
     
     @objc func handleLeft(){
         print(ViewController.varUrl.official)
+    }
+    
+    @objc func handleOfficial(){
+        let index = IndexPath(row: 0, section: 0)
+        let cell: ShopTypeCell = self.userCollectionView.cellForItem(at: index) as! ShopTypeCell
+
+        if officialChecked == false{
+            cell.officialBtn.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
+            officialChecked = true
+        }else if officialChecked == true{
+            cell.officialBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+            officialChecked = false
+        }
     }
     @objc func handleReset(){
         let goldIndex = IndexPath(row: 0, section: 0)
@@ -129,9 +130,9 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
         let officialIndex = IndexPath(row: 1, section: 0)
         let officialCell: ShopTypeCell = self.userCollectionView.cellForItem(at: officialIndex) as! ShopTypeCell
         
-        goldCell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-        officialCell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-        
+//        goldCell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+//        officialCell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+//
         goldChecked = false
         officialChecked = false
     }
@@ -145,14 +146,14 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
 
 class ShopTypeCell: BaseCell {
     
-    let titleLabel : UILabel = {
+    let goldLabel : UILabel = {
         let label = UILabel()
         label.text = "Gold Merchant"
         label.sizeToFit()
         label.font = UIFont.systemFont(ofSize: 20)
         return label
     }()
-    let checkBtn : UIButton = {
+    let goldBtn : UIButton = {
         let button = UIButton()
         button.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
         button.clipsToBounds = true
@@ -165,18 +166,39 @@ class ShopTypeCell: BaseCell {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    let officialLabel : UILabel = {
+        let label = UILabel()
+        label.text = "Official Store"
+        label.sizeToFit()
+        label.font = UIFont.systemFont(ofSize: 20)
+        return label
+    }()
+    let officialBtn : UIButton = {
+        let button = UIButton()
+        if ViewController.varUrl.official == true{
+            button.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
+        }else{
+            button.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+        }
+        button.clipsToBounds = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     override func setupViews() {
         super.setupViews()
         
-        addSubview(titleLabel)
-        addSubview(checkBtn)
+        addSubview(goldLabel)
+        addSubview(goldBtn)
         addSubview(dividerLineView)
+        addSubview(officialBtn)
+        addSubview(officialLabel)
         
-        addConstraintsWithFormat("H:|[v0(25)]-10-[v1]|", views: checkBtn,titleLabel)
+        addConstraintsWithFormat("H:|-5-[v0(25)]-10-[v1]|", views: goldBtn,goldLabel)
+        addConstraintsWithFormat("H:|-5-[v0(25)]-10-[v1]|", views: officialBtn,officialLabel)
         addConstraintsWithFormat("H:|-35-[v0]|", views: dividerLineView)
         
-        addConstraintsWithFormat("V:|-20-[v0(25)]|", views:titleLabel )
-        addConstraintsWithFormat("V:|-20-[v0(25)][v1(1)]-5-|", views:checkBtn,dividerLineView )
+        addConstraintsWithFormat("V:|-20-[v0(25)]-20-[v1(1)]-20-[v2(25)]-20-|", views:goldBtn,dividerLineView,officialBtn )
+        addConstraintsWithFormat("V:|-20-[v0(25)]-20-[v1(1)]-20-[v2(25)]-20-|", views:goldLabel,dividerLineView,officialLabel )
         
     }
 }
