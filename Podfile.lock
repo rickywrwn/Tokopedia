@@ -3,11 +3,13 @@ PODS:
   - AlamofireImage (3.3.1):
     - Alamofire (~> 4.5)
   - Hue (3.0.1)
+  - SKActivityIndicatorView (0.1.0)
   - TTRangeSlider (1.0.6)
 
 DEPENDENCIES:
   - AlamofireImage (~> 3.3)
   - Hue
+  - SKActivityIndicatorView (~> 0.1.0)
   - TTRangeSlider
 
 SPEC REPOS:
@@ -15,14 +17,16 @@ SPEC REPOS:
     - Alamofire
     - AlamofireImage
     - Hue
+    - SKActivityIndicatorView
     - TTRangeSlider
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   AlamofireImage: 3b35b586853abaf94ca1250f4e94cff3c21a4c0d
   Hue: 93e852fa6211ab35922ad8c293f51c43d6c79eb2
+  SKActivityIndicatorView: f46936f760d33eb8235333242269bf01cc9248ae
   TTRangeSlider: 78188bea83f6471a06f75adbc88da5e990baeafe
 
-PODFILE CHECKSUM: 1aa9069e9f1ba85befced3aaeb0c154e0abff05b
+PODFILE CHECKSUM: 8231027b54cf75b773ae999f48bed4150605a436
 
 COCOAPODS: 1.5.3

@@ -20,4 +20,5 @@ target 'tokopedia' do
  pod 'AlamofireImage', '~> 3.3'
  pod 'Hue'
  pod "TTRangeSlider"
+ pod 'SKActivityIndicatorView', '~> 0.1.0'
 end

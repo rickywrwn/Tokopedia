@@ -12,7 +12,7 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
     
     fileprivate let ShopTypeCellId = "ShopTypeCellId"
     var goldChecked = ViewController.varUrl.official
-    var officialChecked = false
+    var officialChecked = ViewController.varUrl.fshop
     
     var userCollectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -41,7 +41,7 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
         userCollectionView.alwaysBounceVertical = true
         userCollectionView.delegate = self
         userCollectionView.dataSource = self
-        userCollectionView.backgroundColor = UIColor.gray
+        userCollectionView.backgroundColor = UIColor(hex: "#f1f1f1")
         userCollectionView.register(ShopTypeCell.self, forCellWithReuseIdentifier: ShopTypeCellId)
         setupView()
     }
@@ -56,8 +56,26 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
         navbar.backgroundColor = UIColor.white
         
         let navigationItem = UINavigationItem()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Filter", style: .done, target: self, action: #selector(handleLeft))
+        var customView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
+        
+        var button = UIButton.init(type: .custom)
+        button.setBackgroundImage(UIImage(named: "x"), for: .normal)
+        button.frame = CGRect(x: 0, y: 5, width: 32, height: 32)
+        button.addTarget(self, action: #selector(handleLeft), for: .touchUpInside)
+        customView.addSubview(button)
+        
+        var marginX = CGFloat(button.frame.origin.x + button.frame.size.width + 15)
+        var label = UILabel(frame: CGRect(x: marginX, y: 0, width: 130, height: 44))
+        label.text = "Shop Type"
+        label.textColor = UIColor.black
+        label.textAlignment = .left
+        customView.addSubview(label)
+        
+        var leftButton = UIBarButtonItem(customView: customView)
+        
+        navigationItem.leftBarButtonItem = leftButton
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .done, target: self, action: #selector(handleReset))
+        navigationItem.rightBarButtonItem?.tintColor = UIColor(hex: "#64b157")
         
         navbar.setItems([navigationItem], animated: false)
         
@@ -84,6 +102,7 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ShopTypeCellId, for: indexPath) as! ShopTypeCell
         cell.backgroundColor = UIColor.white
+        cell.goldBtn.addTarget(self, action: #selector(handleGold), for: .touchDown)
         cell.officialBtn.addTarget(self, action: #selector(handleOfficial), for: .touchDown)
         return cell
     }
@@ -97,19 +116,11 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell: ShopTypeCell = self.userCollectionView.cellForItem(at: indexPath) as! ShopTypeCell
-//        if goldChecked == false {
-//            cell.goldBtn.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
-//            goldChecked = true
-//        }else if goldChecked == true{
-//            cell.goldBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-//            goldChecked = false
-//        }
-        
+
     }
     
     @objc func handleLeft(){
-        print(ViewController.varUrl.official)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc func handleOfficial(){
@@ -124,21 +135,30 @@ class ShopFilterPage: UIViewController,UICollectionViewDataSource, UICollectionV
             officialChecked = false
         }
     }
-    @objc func handleReset(){
-        let goldIndex = IndexPath(row: 0, section: 0)
-        let goldCell: ShopTypeCell = self.userCollectionView.cellForItem(at: goldIndex) as! ShopTypeCell
-        let officialIndex = IndexPath(row: 1, section: 0)
-        let officialCell: ShopTypeCell = self.userCollectionView.cellForItem(at: officialIndex) as! ShopTypeCell
+    @objc func handleGold(){
+        let index = IndexPath(row: 0, section: 0)
+        let cell: ShopTypeCell = self.userCollectionView.cellForItem(at: index) as! ShopTypeCell
         
-//        goldCell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-//        officialCell.checkBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
-//
+        if goldChecked == false{
+            cell.goldBtn.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
+            goldChecked = true
+        }else if goldChecked == true{
+            cell.goldBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+            goldChecked = false
+        }
+    }
+    @objc func handleReset(){
+        let index = IndexPath(row: 0, section: 0)
+        let cell: ShopTypeCell = self.userCollectionView.cellForItem(at: index) as! ShopTypeCell
+        cell.officialBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+        cell.goldBtn.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
         goldChecked = false
         officialChecked = false
     }
     
     @objc func handleApply(){
         ViewController.varUrl.official = officialChecked
+        ViewController.varUrl.fshop = goldChecked
         self.dismiss(animated: true, completion: nil)
     }
 }
@@ -155,7 +175,11 @@ class ShopTypeCell: BaseCell {
     }()
     let goldBtn : UIButton = {
         let button = UIButton()
-        button.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+        if ViewController.varUrl.fshop == true{
+            button.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
+        }else{
+            button.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+        }
         button.clipsToBounds = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button

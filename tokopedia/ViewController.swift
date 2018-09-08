@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SKActivityIndicatorView
 
 struct tokped: Decodable {
     let data: [data]
@@ -22,13 +23,17 @@ struct data: Decodable {
 
 class ViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
 
-    struct varUrl {
-        static var q = "samsung"
+    struct priceRange {
         static var pmin = 10000
         static var pmax = 100000
-        static var wholesale = true
+    }
+    struct varUrl {
+        static var q = "samsung"
+        static var pmin = priceRange.pmin
+        static var pmax = priceRange.pmax
+        static var wholesale = false
         static var official = false
-        static var fshop = "1"
+        static var fshop = false
         static var start = "0"
         static var row = "10"
     }
@@ -36,6 +41,8 @@ class ViewController: UICollectionViewController, UICollectionViewDelegateFlowLa
     var jml : Int = 0
     func fetchJSON(){
         let urlString = "https://ace.tokopedia.com/search/v2.5/product?q=\(String(describing: varUrl.q))&pmin=\(String(describing: varUrl.pmin))&pmax=\(String(describing: varUrl.pmax))&wholesale=\(String(describing: varUrl.wholesale))&official=\(String(describing: varUrl.official))&fshop=\(String(describing: varUrl.fshop))&start=\(String(describing: varUrl.start))&rows=\(String(describing: varUrl.row))"
+        
+        print(urlString)
         URLSession.shared.dataTask(with: URL(string: urlString)!, completionHandler: { (data, response, error) -> Void in
             
             guard let data = data else { return }
@@ -55,10 +62,12 @@ class ViewController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 
                 DispatchQueue.main.async(execute: { () -> Void in
                     self.collectionView!.reloadData()
+                    SKActivityIndicator.dismiss()
                 })
                 
             } catch let err {
                 print(err)
+                SKActivityIndicator.dismiss()
             }
             
             
@@ -66,15 +75,18 @@ class ViewController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        SKActivityIndicator.show("Loading...")
         fetchJSON()
-        //print(ViewController.url)
         collectionView?.reloadData()
+        SKActivityIndicator.dismiss()
     }
     
     fileprivate let ProductCellId = "ProductCellId"
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        SKActivityIndicator.show("Loading...")
         fetchJSON()
         setupView()
         collectionView?.backgroundColor = UIColor.white

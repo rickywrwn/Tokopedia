@@ -32,15 +32,19 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
     }()
     
     override func viewDidLoad() {
-        view.backgroundColor = UIColor.red
+        view.backgroundColor = UIColor(hex: "#f1f1f1")
         view.addSubview(userCollectionView)
         userCollectionView.alwaysBounceVertical = true
         userCollectionView.delegate = self
         userCollectionView.dataSource = self
-        userCollectionView.backgroundColor = UIColor.gray
+        userCollectionView.backgroundColor = UIColor(hex: "#f1f1f1")
         userCollectionView.register(PriceCell.self, forCellWithReuseIdentifier: PriceCellId)
         userCollectionView.register(ShopCell.self, forCellWithReuseIdentifier: ShopCellId)
         setupView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        userCollectionView.reloadData()
     }
     
     func setupView(){
@@ -53,8 +57,27 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
         navbar.backgroundColor = UIColor.white
         
         let navigationItem = UINavigationItem()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Filter", style: .done, target: self, action: #selector(handleLeft))
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .done, target: self, action: #selector(handleReset))
+        var customView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
+        
+        var button = UIButton.init(type: .custom)
+        button.setBackgroundImage(UIImage(named: "x"), for: .normal)
+        button.frame = CGRect(x: 0, y: 5, width: 32, height: 32)
+        button.addTarget(self, action: #selector(handleLeft), for: .touchUpInside)
+        customView.addSubview(button)
+        
+        var marginX = CGFloat(button.frame.origin.x + button.frame.size.width + 15)
+        var label = UILabel(frame: CGRect(x: marginX, y: 0, width: 65, height: 44))
+        label.text = "Filter"
+        label.textColor = UIColor.black
+        label.textAlignment = .left
+        customView.addSubview(label)
+        
+        var leftButton = UIBarButtonItem(customView: customView)
+        
+        navigationItem.leftBarButtonItem = leftButton
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: self, action: #selector(handleReset))
+        navigationItem.rightBarButtonItem?.tintColor = UIColor(hex: "#64b157")
         
         navbar.setItems([navigationItem], animated: false)
         
@@ -63,7 +86,7 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
         statusBarView.backgroundColor = statusBarColor
         view.addSubview(statusBarView)
         
-        userCollectionView.topAnchor.constraint(equalTo: navbar.bottomAnchor, constant: 0).isActive = true
+        userCollectionView.topAnchor.constraint(equalTo: navbar.bottomAnchor, constant: 10).isActive = true
         userCollectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
         userCollectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
         userCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
@@ -87,6 +110,8 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
             return cell
         }
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ShopCellId, for: indexPath) as! ShopCell
+        cell.GoldSwitch.addTarget(self, action: #selector(handleGold), for: .touchDown)
+        cell.OfficialSwitch.addTarget(self, action: #selector(handleOfficial), for: .touchDown)
         cell.backgroundColor = UIColor.white
         return cell
     }
@@ -98,9 +123,9 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
         
         if indexPath.row == 0{
 
-            return CGSize(width: view.frame.width, height: 250)
+            return CGSize(width: view.frame.width, height: 170)
         }
-        return CGSize(width: view.frame.width, height: 150)
+        return CGSize(width: view.frame.width, height: 110)
     }
     @objc func sliderValueDidChange(){
         let index = IndexPath(row: 0, section: 0)
@@ -119,16 +144,20 @@ class FilterPage: UIViewController, UICollectionViewDataSource, UICollectionView
     }
     
     @objc func handleLeft(){
-        print(ViewController.varUrl.pmin)
-        print(ViewController.varUrl.pmax)
-        print(ViewController.varUrl.official)
+        self.dismiss(animated: true, completion: nil)
+    }
+    @objc func handleGold(){
+        ViewController.varUrl.fshop = false
+    }
+    @objc func handleOfficial(){
+        ViewController.varUrl.official = false
     }
     @objc func handleReset(){
         let index = IndexPath(row: 0, section: 0)
         let cell: PriceCell = self.userCollectionView.cellForItem(at: index) as! PriceCell
         
-        cell.priceSlider.selectedMinimum = 10000
-        cell.priceSlider.selectedMaximum = 100000
+        cell.priceSlider.selectedMinimum = Float(ViewController.priceRange.pmin)
+        cell.priceSlider.selectedMaximum = Float(ViewController.priceRange.pmax)
         cell.wholeSwitch.isOn = false
     }
     
@@ -156,14 +185,14 @@ class PriceCell: BaseCell {
         let label = UILabel()
         label.text = "Minimum Price"
         label.sizeToFit()
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
     let labelMax : UILabel = {
         let label = UILabel()
         label.text = "Maximum Price"
         label.sizeToFit()
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.font = UIFont.systemFont(ofSize: 12)
         label.textAlignment = .right
         return label
     }()
@@ -171,27 +200,27 @@ class PriceCell: BaseCell {
         let label = UILabel()
         label.text = "Rp " + String(ViewController.varUrl.pmin)
         label.sizeToFit()
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.font = UIFont.systemFont(ofSize: 18)
         return label
     }()
     let hargaMax : UILabel = {
         let label = UILabel()
         label.text = "Rp " + String(ViewController.varUrl.pmax)
         label.sizeToFit()
-        label.font = UIFont.systemFont(ofSize: 15)
+        label.font = UIFont.systemFont(ofSize: 18)
         label.textAlignment = .right
         return label
     }()
     
     let priceSlider : TTRangeSlider = {
         let slider = TTRangeSlider()
-        slider.minValue = 10000
-        slider.maxValue = 100000
+        slider.minValue = Float(ViewController.priceRange.pmin)
+        slider.maxValue = Float(ViewController.priceRange.pmax)
         slider.selectedMinimum = Float(ViewController.varUrl.pmin)
         slider.selectedMaximum = Float(ViewController.varUrl.pmax)
-        slider.tintColorBetweenHandles = UIColor.green
+        slider.tintColorBetweenHandles = UIColor(hex: "#64b157")
         slider.handleColor = UIColor.white
-        slider.handleBorderColor = UIColor.green
+        slider.handleBorderColor = UIColor(hex: "#64b157")
         slider.handleBorderWidth = 1
         slider.handleDiameter = 33
         slider.hideLabels = true
@@ -210,10 +239,8 @@ class PriceCell: BaseCell {
     let wholeSwitch : UISwitch = {
         let whole = UISwitch()
         whole.setOn(false, animated: false)
-        whole.tintColor = UIColor.blue
-        whole.onTintColor = UIColor.cyan
-        whole.thumbTintColor = UIColor.red
-        whole.backgroundColor = UIColor.yellow
+        whole.tintColor = UIColor(hex: "#64b157")
+        whole.onTintColor = UIColor(hex: "#64b157")
         whole.isOn = ViewController.varUrl.wholesale
         return whole
     }()
@@ -239,11 +266,11 @@ class PriceCell: BaseCell {
         
         addConstraintsWithFormat("H:|-10-[v0(150)][v1(150)]-5-|", views: labelMin,labelMax)
         addConstraintsWithFormat("H:|-10-[v0(150)]-5-[v2][v1(150)]-5-|", views: hargaMin,hargaMax,dividerLineView)
-        addConstraintsWithFormat("H:|-10-[v0]-10-|", views: priceSlider)
-        addConstraintsWithFormat("H:|-10-[v0(150)][v1(50)]-5-|", views: wholeLabel,wholeSwitch)
+        addConstraintsWithFormat("H:|-15-[v0]-15-|", views: priceSlider)
+        addConstraintsWithFormat("H:|-10-[v0(150)][v1(50)]-10-|", views: wholeLabel,wholeSwitch)
         
-        addConstraintsWithFormat("V:[v0]-5-[v1]-5-[v2]-5-[v3]|", views: labelMin,hargaMin,priceSlider,wholeLabel)
-        addConstraintsWithFormat("V:[v0]-5-[v1]-5-[v2]-5-[v3]|", views: labelMax,hargaMax,priceSlider,wholeSwitch)
+        addConstraintsWithFormat("V:[v0]-5-[v1]-5-[v2]-5-[v3]-10-|", views: labelMin,hargaMin,priceSlider,wholeLabel)
+        addConstraintsWithFormat("V:[v0]-5-[v1]-5-[v2]-5-[v3]-10-|", views: labelMax,hargaMax,priceSlider,wholeSwitch)
         
     }
 }
@@ -252,37 +279,31 @@ class ShopCell: BaseCell {
     
     let TitleLabel : UILabel = {
         let label = UILabel()
-        label.text = "labelMin"
+        label.text = "Shop Type"
         label.sizeToFit()
-        label.font = UIFont.systemFont(ofSize: 15)
-        label.layer.borderWidth = 1
-        label.layer.borderColor = UIColor.black.cgColor
+        label.font = UIFont.systemFont(ofSize: 20)
         return label
     }()
     let nextImg: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
-        iv.backgroundColor = UIColor.green
+        iv.image = UIImage(named: "next")
         iv.layer.masksToBounds = true
         return iv
     }()
-    let GoldenSwitch : UISwitch = {
-        let whole = UISwitch()
-        whole.setOn(false, animated: false)
-        whole.tintColor = UIColor.blue
-        whole.onTintColor = UIColor.cyan
-        whole.thumbTintColor = UIColor.red
-        whole.backgroundColor = UIColor.yellow
-        return whole
+    let GoldSwitch : UIButton = {
+        let button = UIButton()
+        button.setImage(#imageLiteral(resourceName: "gold"), for: .normal)
+        button.clipsToBounds = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
-    let OfficialSwitch : UISwitch = {
-        let whole = UISwitch()
-        whole.setOn(false, animated: false)
-        whole.tintColor = UIColor.blue
-        whole.onTintColor = UIColor.cyan
-        whole.thumbTintColor = UIColor.red
-        whole.backgroundColor = UIColor.yellow
-        return whole
+    let OfficialSwitch : UIButton = {
+        let button = UIButton()
+        button.setImage(#imageLiteral(resourceName: "official"), for: .normal)
+        button.clipsToBounds = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     override func setupViews() {
@@ -290,14 +311,14 @@ class ShopCell: BaseCell {
         
         addSubview(TitleLabel)
         addSubview(nextImg)
-        addSubview(GoldenSwitch)
+        addSubview(GoldSwitch)
         addSubview(OfficialSwitch)
         
-        addConstraintsWithFormat("H:|-10-[v0(150)][v1(50)]-5-|", views: TitleLabel,nextImg)
-        addConstraintsWithFormat("H:|-10-[v0(150)][v1(150)]-5-|", views: GoldenSwitch,OfficialSwitch)
+        addConstraintsWithFormat("H:|-10-[v0(150)][v1(30)]-5-|", views: TitleLabel,nextImg)
+        addConstraintsWithFormat("H:|-10-[v0(150)]-10-[v1(150)]", views: GoldSwitch,OfficialSwitch)
         
-        addConstraintsWithFormat("V:[v0(50)]-5-[v1]|", views: TitleLabel,GoldenSwitch)
-        addConstraintsWithFormat("V:[v0(50)]-5-[v1]|", views: nextImg,OfficialSwitch)
+        addConstraintsWithFormat("V:|[v0(50)]-25-[v1(50)]-10-|", views: TitleLabel,GoldSwitch)
+        addConstraintsWithFormat("V:|-10-[v0(30)]-25-[v1(50)]-10-|", views: nextImg,OfficialSwitch)
         
     }
 }
