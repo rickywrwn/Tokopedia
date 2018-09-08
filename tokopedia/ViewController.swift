@@ -27,18 +27,15 @@ class ViewController: UICollectionViewController, UICollectionViewDelegateFlowLa
         static var pmin = 10000
         static var pmax = 100000
         static var wholesale = true
-        static var official = true
-        static var fshop = "2"
+        static var official = false
+        static var fshop = "1"
         static var start = "0"
         static var row = "10"
     }
-    
-    static var url : String = "https://ace.tokopedia.com/search/v2.5/product?q=\(String(describing: varUrl.q))&pmin=\(String(describing: varUrl.pmin))&pmax=\(String(describing: varUrl.pmax))&wholesale=\(String(describing: varUrl.wholesale))&official=\(String(describing: varUrl.official))&fshop=\(String(describing: varUrl.fshop))&start=\(String(describing: varUrl.start))&rows=\(String(describing: varUrl.row))"
     var products : tokped?
     var jml : Int = 0
     func fetchJSON(){
-        let urlString = ViewController.url
-        
+        let urlString = "https://ace.tokopedia.com/search/v2.5/product?q=\(String(describing: varUrl.q))&pmin=\(String(describing: varUrl.pmin))&pmax=\(String(describing: varUrl.pmax))&wholesale=\(String(describing: varUrl.wholesale))&official=\(String(describing: varUrl.official))&fshop=\(String(describing: varUrl.fshop))&start=\(String(describing: varUrl.start))&rows=\(String(describing: varUrl.row))"
         URLSession.shared.dataTask(with: URL(string: urlString)!, completionHandler: { (data, response, error) -> Void in
             
             guard let data = data else { return }
@@ -52,7 +49,7 @@ class ViewController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 
                 let decoder = JSONDecoder()
                 let product = try decoder.decode(tokped.self, from: data)
-                print(product)
+                //print(product)
                 self.jml = product.data.count
                 self.products = product
                 
@@ -66,6 +63,12 @@ class ViewController: UICollectionViewController, UICollectionViewDelegateFlowLa
             
             
         }).resume()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        fetchJSON()
+        //print(ViewController.url)
+        collectionView?.reloadData()
     }
     
     fileprivate let ProductCellId = "ProductCellId"
