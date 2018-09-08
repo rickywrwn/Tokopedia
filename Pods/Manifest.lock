@@ -1,0 +1,28 @@
+PODS:
+  - Alamofire (4.7.3)
+  - AlamofireImage (3.3.1):
+    - Alamofire (~> 4.5)
+  - Hue (3.0.1)
+  - TTRangeSlider (1.0.6)
+
+DEPENDENCIES:
+  - AlamofireImage (~> 3.3)
+  - Hue
+  - TTRangeSlider
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - AlamofireImage
+    - Hue
+    - TTRangeSlider
+
+SPEC CHECKSUMS:
+  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  AlamofireImage: 3b35b586853abaf94ca1250f4e94cff3c21a4c0d
+  Hue: 93e852fa6211ab35922ad8c293f51c43d6c79eb2
+  TTRangeSlider: 78188bea83f6471a06f75adbc88da5e990baeafe
+
+PODFILE CHECKSUM: 1aa9069e9f1ba85befced3aaeb0c154e0abff05b
+
+COCOAPODS: 1.5.3
